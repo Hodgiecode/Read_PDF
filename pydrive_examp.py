@@ -14,18 +14,17 @@ app = Flask(__name__)
 
 
 def myfunc():
-    arg2= request.args.get('book', default = '1', type = str)
-    arg3 = request.args.get('id',default = '*', type = str)
-    arg4 = request.args.get('exer',default = '1', type = str)
+    arg1= request.args.get('book', default = '1', type = str)
+    arg2 = request.args.get('src',default = '1', type = str)
     ids=1
 
-    book_name=arg2+".pdf"
-    pic_name="pic_"+arg2+"_"+arg4+".png"
+    book_name=arg1+".pdf"
+    pic_name="pic_"+arg1+"_"+arg2+".png"
     pdf = pdfplumber.open(book_name)
 
     for i in range(len(pdf.pages)):
         text = pdf.pages[i].extract_text()
-        if arg4+"." in text and i>6:
+        if arg2 in text:
             ids=i
             break
 
@@ -48,14 +47,13 @@ def myfunc():
 
     gauth.SaveCredentialsFile("credentials.txt")
     drive = GoogleDrive(gauth)
-    file_drive = drive.CreateFile({'parents': [{'id': ["19r_Of5Jq80IZSnWg2XinE4vdl2ShiywO"]}],'title':pic_name, 'mimeType':'image/png'})
+    file_drive = drive.CreateFile({'parents': [{'id': ["id of directory in Google Drive"]}],'title':pic_name, 'mimeType':'image/png'})
     file_drive.SetContentFile(pic_name)
     file_drive.Upload()
     id_in_gdrive=file_drive['id']
 
     photo_url="https://docs.google.com/uc?id="+id_in_gdrive
-    url_= 'https://api.telegram.org/bot'+botToken+'/sendMessage?chat_id='+arg3+"&disable_web_page_preview=false&text="+photo_url
-    return url_
+    return photo_url
 
 
 if __name__ == '__main__':
